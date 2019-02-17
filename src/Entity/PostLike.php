@@ -80,7 +80,7 @@ class PostLike
      */
     public function prePersist()
     {
-        if ($this->createdAt) {
+        if (!$this->createdAt) {
             $this->createdAt = new \DateTime();
         }
     }
