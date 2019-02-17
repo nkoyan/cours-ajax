@@ -17,7 +17,7 @@
                         <h3>{{post.title}}</h3>
                         <p>{{post.introduction}}</p>
                         <a href="#" class="btn btn-primary">Lire la suite</a>
-                        <a href="#" class="btn btn-link js-like">
+                        <a href="{{ path('post_like', {'id': post.id}) }}" class="btn btn-link js-like">
                             {% if app.user and post.likedByUser(app.user) %}
                                 <i class="fas fa-thumbs-up"></i>
                             {% else %}
@@ -32,4 +32,41 @@
             {% endfor %}
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+
+        function onClickBtnLike(event) {
+            event.preventDefault();
+
+            const url = this.href;
+            const spanCount = this.querySelector('.js-likes');
+            const icone = this.querySelector('i');
+            const label = this.querySelector('.js-label');
+            
+            axios.get(url).then(function (response) {
+                spanCount.textContent = response.data.likes;
+
+                if (icone.classList.contains('far')) {
+                    icone.classList.replace('far', 'fas');
+                    label.textContent = "Je n'aime plus";
+                } else {
+                    icone.classList.replace('fas', 'far');
+                    label.textContent = "J'aime";
+                }
+            }).catch(function (error) {
+                if (error.response.status === 403) {
+                    window.alert('Vous ne pouvez pas liker un article si vous n\'êtes pas connecté !');
+                } else {
+                    window.alert('Error');
+                }
+            });
+        }
+
+        document.querySelectorAll('a.js-like').forEach(function (link) {
+            link.addEventListener('click', onClickBtnLike);
+        })
+    </script>
 {% endblock %}
